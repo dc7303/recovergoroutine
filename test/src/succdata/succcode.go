@@ -21,6 +21,7 @@ func anonymousFuncCall() {
 
 func funcCall() {
 	go runGoroutine()
+	go nestedFunc1()
 }
 
 func runGoroutine() {
@@ -28,3 +29,11 @@ func runGoroutine() {
 		recover()
 	}()
 }
+
+func nestedFunc1() {
+	// must have recover in parent caller
+	nestedFunc2()
+	recover()
+}
+
+func nestedFunc2() {}

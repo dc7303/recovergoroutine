@@ -1,6 +1,6 @@
 package faildata
 
-func Run() {
+func anonymousFuncCall() {
 	go func() {
 		defer func() {
 			// recover comment
@@ -18,4 +18,18 @@ func Run() {
 	}()
 }
 
+func funcCall() {
+	go runGoroutine()
+	go nestedFunc1()
+}
+
+func runGoroutine() {}
+
 func foo(_ int) {}
+
+func nestedFunc1() {
+	// must have recover in parent caller
+	nestedFunc2()
+}
+
+func nestedFunc2() {}
