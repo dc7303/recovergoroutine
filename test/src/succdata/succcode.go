@@ -19,6 +19,10 @@ func anonymousFuncCall() {
 	}()
 }
 
+func funcCall() {
+	go runGoroutine()
+}
+
 func runGoroutine() {
 	defer func() {
 		recover()
