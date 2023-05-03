@@ -16,6 +16,11 @@ func anonymousFuncCall() {
 	func() {
 		// not checked
 	}()
+
+	go func() {
+		// not used defer
+		recover()
+	}()
 }
 
 func funcCall() {
@@ -29,6 +34,7 @@ func foo(_ int) {}
 
 func nestedFunc1() {
 	// must have recover in parent caller
+	recover()
 	nestedFunc2()
 }
 

@@ -13,10 +13,6 @@ func anonymousFuncCall() {
 			recover()
 		}()
 	}()
-
-	go func() {
-		recover()
-	}()
 }
 
 func funcCall() {
@@ -33,7 +29,9 @@ func runGoroutine() {
 func nestedFunc1() {
 	// must have recover in parent caller
 	nestedFunc2()
-	recover()
+	defer func() {
+		recover()
+	}()
 }
 
 func nestedFunc2() {}

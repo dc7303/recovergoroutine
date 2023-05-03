@@ -41,7 +41,7 @@ func TestLint(t *testing.T) {
 			"faildata",
 		)
 		for _, result := range results {
-			assert.Len(t, result.Diagnostics, 4)
+			assert.Len(t, result.Diagnostics, 5)
 			assert.NoError(t, result.Err)
 		}
 	})
@@ -52,5 +52,5 @@ func testDataDir() string {
 	if !ok {
 		panic("unable to get current test filename")
 	}
-	return filepath.Join(filepath.Dir(testFilename), "test")
+	return filepath.Join(filepath.Dir(testFilename), "..", "test")
 }

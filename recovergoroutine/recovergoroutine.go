@@ -41,11 +41,12 @@ func safeGoStmt(goStmt *ast.GoStmt) bool {
 	fn := goStmt.Call
 	safeGoStmt := false
 	ast.Inspect(fn, func(n ast.Node) bool {
-		callExpr, ok := n.(*ast.CallExpr)
+		deferStmt, ok := n.(*ast.DeferStmt)
 		if !ok {
 			return true
 		}
 
+		callExpr := deferStmt.Call
 		if isRecover(callExpr) {
 			safeGoStmt = true
 			return false
