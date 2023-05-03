@@ -1,9 +1,8 @@
 package main
 
 import (
+	linters "github.com/dc7303/recovergoroutine/recovergoroutine"
 	"golang.org/x/tools/go/analysis"
-
-	linters "github.com/dc7303/recovergoroutine"
 )
 
 type analyzerPlugin struct{}

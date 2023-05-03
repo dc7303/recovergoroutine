@@ -2,14 +2,13 @@ package recovergoroutine_test
 
 import (
 	"fmt"
+	"github.com/dc7303/recovergoroutine/recovergoroutine"
 	"path/filepath"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/tools/go/analysis/analysistest"
-
-	"github.com/dc7303/recovergoroutine"
 )
 
 type CustomTesting struct {
