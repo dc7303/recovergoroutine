@@ -1,6 +1,6 @@
 package faildata
 
-func anonymousFuncCall() {
+func whenASTFuncLit() {
 	go func() {
 		defer func() {
 			// recover comment
@@ -23,7 +23,7 @@ func anonymousFuncCall() {
 	}()
 }
 
-func funcCall() {
+func whenASTIndent() {
 	go runGoroutine()
 	go nestedFunc1()
 }
