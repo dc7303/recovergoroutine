@@ -20,14 +20,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				return true
 			}
 
-			if !safeGoStmt(goStmt) {
-				pass.Report(analysis.Diagnostic{
-					Pos:      goStmt.Pos(),
-					End:      0,
-					Category: "goroutine",
-					Message:  "goroutine must has recover",
-				})
+			if safeGoStmt(goStmt) {
+				return true
 			}
+
+			pass.Report(analysis.Diagnostic{
+				Pos:      goStmt.Pos(),
+				End:      0,
+				Category: "goroutine",
+				Message:  "goroutine must have recover",
+			})
 
 			return false
 		})
@@ -39,38 +41,44 @@ func safeGoStmt(goStmt *ast.GoStmt) bool {
 	fn := goStmt.Call
 	safeGoStmt := false
 	ast.Inspect(fn, func(n ast.Node) bool {
-		if callExpr, ok := n.(*ast.CallExpr); ok {
-			if hasRecover(callExpr) {
+		callExpr, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+
+		if isRecover(callExpr) {
+			safeGoStmt = true
+			return false
+		}
+
+		ident, ok := callExpr.Fun.(*ast.Ident)
+		if !ok {
+			return true
+		}
+
+		if ident.Obj == nil {
+			return true
+		}
+
+		funcDecl, ok := ident.Obj.Decl.(*ast.FuncDecl)
+		if !ok {
+			return true
+		}
+
+		ast.Inspect(funcDecl, func(node ast.Node) bool {
+			if callExpr, ok := node.(*ast.CallExpr); ok && isRecover(callExpr) {
 				safeGoStmt = true
 				return false
 			}
-
-			if ident, ok := callExpr.Fun.(*ast.Ident); ok {
-				if ident.Obj == nil {
-					return true
-				}
-
-				funcDecl, ok := ident.Obj.Decl.(*ast.FuncDecl)
-				if !ok {
-					return true
-				}
-
-				ast.Inspect(funcDecl, func(node ast.Node) bool {
-					if callExpr, ok := node.(*ast.CallExpr); ok && hasRecover(callExpr) {
-						safeGoStmt = true
-						return false
-					}
-					return true
-				})
-			}
-		}
+			return true
+		})
 		return true
 	})
 
 	return safeGoStmt
 }
 
-func hasRecover(callExpr *ast.CallExpr) bool {
+func isRecover(callExpr *ast.CallExpr) bool {
 	ident, ok := callExpr.Fun.(*ast.Ident)
 	if !ok {
 		return false

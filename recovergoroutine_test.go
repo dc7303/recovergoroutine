@@ -17,7 +17,7 @@ type CustomTesting struct {
 }
 
 func (c *CustomTesting) Errorf(format string, args ...any) {
-	c.t.Log((fmt.Sprintf(format, args...)))
+	c.t.Log(fmt.Sprintf(format, args...))
 }
 
 func TestLint(t *testing.T) {
