@@ -67,11 +67,22 @@ func safeFunc(node ast.Node) bool {
 			return true
 		}
 
-		ast.Inspect(deferStmt, func(node ast.Node) bool {
-			if callExpr, ok := node.(*ast.CallExpr); ok && isRecover(callExpr) {
+		ast.Inspect(deferStmt.Call, func(node ast.Node) bool {
+			callExpr, ok := node.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+
+			if isRecover(callExpr) {
 				result = true
 				return false
 			}
+
+			if isCustomRecover(callExpr) {
+				result = true
+				return false
+			}
+
 			return true
 		})
 
@@ -88,4 +99,29 @@ func isRecover(callExpr *ast.CallExpr) bool {
 	}
 
 	return ident.Name == "recover"
+}
+
+func isCustomRecover(callExpr *ast.CallExpr) bool {
+	result := false
+	if ident, ok := callExpr.Fun.(*ast.Ident); ok {
+		if ident.Obj == nil {
+			return true
+		}
+
+		funcDecl, ok := ident.Obj.Decl.(*ast.FuncDecl)
+		if !ok {
+			return true
+		}
+
+		ast.Inspect(funcDecl, func(node ast.Node) bool {
+			if callExpr, ok := node.(*ast.CallExpr); ok && isRecover(callExpr) {
+				result = true
+				return false
+			}
+
+			return true
+		})
+	}
+
+	return result
 }

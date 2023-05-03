@@ -21,6 +21,10 @@ func whenASTFuncLit() {
 		// not used defer
 		recover()
 	}()
+
+	go func() {
+		defer customRecover()
+	}()
 }
 
 func whenASTIndent() {
@@ -39,3 +43,5 @@ func nestedFunc1() {
 }
 
 func nestedFunc2() {}
+
+func customRecover() {}

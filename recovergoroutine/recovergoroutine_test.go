@@ -41,7 +41,7 @@ func TestLint(t *testing.T) {
 			"faildata",
 		)
 		for _, result := range results {
-			assert.Len(t, result.Diagnostics, 5)
+			assert.Len(t, result.Diagnostics, 6)
 			assert.NoError(t, result.Err)
 		}
 	})
