@@ -1,6 +1,6 @@
 package succdata
 
-func anonymousFuncCall() {
+func whenLit() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -13,9 +13,19 @@ func anonymousFuncCall() {
 			recover()
 		}()
 	}()
+
+	go func() {
+		rec := func() {
+			defer func() {
+				recover()
+			}()
+		}
+
+		defer rec()
+	}()
 }
 
-func funcCall() {
+func whenIdent() {
 	go runGoroutine()
 	go nestedFunc1()
 }

@@ -2,7 +2,6 @@ package recovergoroutine
 
 import (
 	"go/ast"
-
 	"golang.org/x/tools/go/analysis"
 )
 
@@ -39,24 +38,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 func safeGoStmt(goStmt *ast.GoStmt) bool {
 	fn := goStmt.Call
-	safeGoStmt := false
-	ast.Inspect(fn, func(n ast.Node) bool {
-		deferStmt, ok := n.(*ast.DeferStmt)
-		if !ok {
-			return true
-		}
+	result := false
+	if funcLit, ok := fn.Fun.(*ast.FuncLit); ok {
+		result = safeFunc(funcLit)
+	}
 
-		callExpr := deferStmt.Call
-		if isRecover(callExpr) {
-			safeGoStmt = true
-			return false
-		}
-
-		ident, ok := callExpr.Fun.(*ast.Ident)
-		if !ok {
-			return true
-		}
-
+	if ident, ok := fn.Fun.(*ast.Ident); ok {
 		if ident.Obj == nil {
 			return true
 		}
@@ -66,17 +53,32 @@ func safeGoStmt(goStmt *ast.GoStmt) bool {
 			return true
 		}
 
-		ast.Inspect(funcDecl, func(node ast.Node) bool {
+		result = safeFunc(funcDecl)
+	}
+
+	return result
+}
+
+func safeFunc(node ast.Node) bool {
+	result := false
+	ast.Inspect(node, func(node ast.Node) bool {
+		deferStmt, ok := node.(*ast.DeferStmt)
+		if !ok {
+			return true
+		}
+
+		ast.Inspect(deferStmt, func(node ast.Node) bool {
 			if callExpr, ok := node.(*ast.CallExpr); ok && isRecover(callExpr) {
-				safeGoStmt = true
+				result = true
 				return false
 			}
 			return true
 		})
-		return true
+
+		return !result
 	})
 
-	return safeGoStmt
+	return result
 }
 
 func isRecover(callExpr *ast.CallExpr) bool {
